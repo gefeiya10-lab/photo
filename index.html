@@ -1,14 +1,31 @@
 <!doctype html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#fffaf3" />
-    <title>时光贴贴屋</title>
-    <script type="module" crossorigin src="/photo/assets/index-C0xaMh91.js"></script>
-    <link rel="stylesheet" crossorigin href="/photo/assets/index-DFAy1pjF.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#f8f4ef" />
+  <meta name="description" content="时光贴贴屋 - 无需 VPN 的复古大头贴制作器" />
+  <title>时光贴贴屋</title>
+  <link rel="stylesheet" href="./assets/css/styles.css" />
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="./"><span class="brand-mark">✿</span><span><b>时光贴贴屋</b><small>PHOTO BOOTH LAB</small></span></a><button id="resetBtn" class="ghost-btn" type="button">重新开始</button></header>
+  <main class="page-shell">
+    <section class="hero"><p class="eyebrow">Y2K · 旧网感 · 低饱和</p><h1>做一张真的像“大头贴”的照片</h1><p>上传 1–4 张照片，边框会盖住照片边缘，中间人像区域保持完全通透。全部本地处理，不上传服务器。</p></section>
+    <section class="workspace">
+      <aside class="panel control-panel">
+        <div class="step-head"><span>01</span><div><b>照片</b><small>最多 4 张</small></div></div>
+        <label class="upload-box" for="photoInput"><span class="upload-icon">＋</span><b>选择照片</b><small>JPG / PNG / WEBP，可多选</small></label><input id="photoInput" type="file" accept="image/*" multiple hidden /><div id="thumbList" class="thumb-list"></div>
+        <div class="divider"></div><div class="step-head"><span>02</span><div><b>照片效果</b><small>轻调，不做 AI 塑料感</small></div></div>
+        <div class="control-row"><label for="brightness">亮度</label><output id="brightnessVal">100</output></div><input id="brightness" class="range" type="range" min="75" max="125" value="100" />
+        <div class="control-row"><label for="contrast">对比度</label><output id="contrastVal">100</output></div><input id="contrast" class="range" type="range" min="80" max="120" value="100" />
+        <div class="control-row"><label for="saturation">饱和度</label><output id="saturationVal">92</output></div><input id="saturation" class="range" type="range" min="55" max="125" value="92" />
+        <div class="filter-pills" id="filterPills"><button class="pill active" data-filter="clean">干净</button><button class="pill" data-filter="ccd">CCD</button><button class="pill" data-filter="cream">奶油</button><button class="pill" data-filter="cool">冷白</button></div>
+      </aside>
+      <section class="preview-column"><div class="preview-stage"><div id="photoStrip" class="photo-strip frame-dusty-pink"><div class="strip-title" id="stripTitle">TIME STICKER CLUB</div><div id="slots" class="slots"></div><div class="strip-footer"><span>2000's memory</span><span id="dateStamp"></span></div></div></div><div class="preview-actions"><button id="downloadBtn" class="primary-btn">保存高清 PNG</button><button id="shuffleBtn" class="secondary-btn">换一个边框</button></div><p class="privacy-note">照片只在你的浏览器里处理，不会上传。</p></section>
+      <aside class="panel frame-panel"><div class="step-head"><span>03</span><div><b>边框</b><small>装饰只在四周，人像区透明</small></div></div><div id="frameGrid" class="frame-grid"></div><div class="divider"></div><label class="field-label" for="captionInput">顶部文字</label><input id="captionInput" class="text-input" maxlength="22" value="TIME STICKER CLUB" /><div class="caption-presets"><button data-caption="TODAY'S CUT">TODAY'S CUT</button><button data-caption="우리의 순간">우리의 순간</button><button data-caption="LOVE.zip">LOVE.zip</button></div></aside>
+    </section>
+  </main>
+  <div id="toast" class="toast" role="status"></div><script type="module" src="./assets/js/app.js"></script>
+</body>
 </html>
