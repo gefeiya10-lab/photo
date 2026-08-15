@@ -1,0 +1,21 @@
+import {FRAMES,renderFrameCards} from './frames.js';
+import {exportStrip} from './exporter.js';
+
+const $=s=>document.querySelector(s);
+const state={photos:[],frameId:'dusty-pink',filter:'clean',brightness:100,contrast:100,saturation:92,caption:'TIME STICKER CLUB'};
+const strip=$('#photoStrip'),slots=$('#slots'),thumbList=$('#thumbList'),toast=$('#toast');
+function notify(text){toast.textContent=text;toast.classList.add('show');clearTimeout(notify.t);notify.t=setTimeout(()=>toast.classList.remove('show'),1800)}
+function previewFilter(){const preset={clean:'',ccd:' sepia(.06) contrast(1.04)',cream:' sepia(.12) brightness(1.03)',cool:' hue-rotate(8deg) brightness(1.03)'}[state.filter];return `brightness(${state.brightness}%) contrast(${state.contrast}%) saturate(${state.saturation}%)${preset}`}
+function renderSlots(){slots.innerHTML='';for(let i=0;i<4;i++){const photo=state.photos.length?state.photos[i%state.photos.length]:null;const el=document.createElement('div');el.className=`slot ${photo?'':'empty'}`;if(photo){const img=document.createElement('img');img.src=photo.src;img.alt=`照片 ${i+1}`;img.style.filter=previewFilter();el.appendChild(img)}else el.textContent=`PHOTO ${i+1}`;slots.appendChild(el)}}
+function renderThumbs(){thumbList.innerHTML='';state.photos.forEach((p,i)=>{const el=document.createElement('div');el.className='thumb';el.innerHTML=`<img src="${p.src}" alt="已选照片 ${i+1}"><button type="button" aria-label="删除照片">×</button>`;el.querySelector('button').onclick=()=>{URL.revokeObjectURL(p.src);state.photos.splice(i,1);renderThumbs();renderSlots()};thumbList.appendChild(el)})}
+function setFrame(id){state.frameId=id;strip.className=`photo-strip frame-${id}`;renderFrameCards($('#frameGrid'),id,setFrame)}
+function reset(){state.photos.forEach(p=>URL.revokeObjectURL(p.src));state.photos=[];state.frameId='dusty-pink';state.filter='clean';state.brightness=100;state.contrast=100;state.saturation=92;state.caption='TIME STICKER CLUB';$('#brightness').value=100;$('#contrast').value=100;$('#saturation').value=92;$('#brightnessVal').textContent=100;$('#contrastVal').textContent=100;$('#saturationVal').textContent=92;$('#captionInput').value=state.caption;$('#stripTitle').textContent=state.caption;document.querySelectorAll('.pill').forEach(x=>x.classList.toggle('active',x.dataset.filter==='clean'));renderThumbs();renderSlots();setFrame(state.frameId);notify('已重新开始')}
+$('#photoInput').addEventListener('change',e=>{const files=[...e.target.files].filter(f=>f.type.startsWith('image/')).slice(0,4-state.photos.length);files.forEach(file=>state.photos.push({file,src:URL.createObjectURL(file)}));renderThumbs();renderSlots();e.target.value='';if(files.length)notify(`已加入 ${files.length} 张照片`)});
+for(const key of ['brightness','contrast','saturation']){const input=$(`#${key}`),out=$(`#${key}Val`);input.addEventListener('input',()=>{state[key]=Number(input.value);out.textContent=input.value;renderSlots()})}
+$('#filterPills').addEventListener('click',e=>{const b=e.target.closest('[data-filter]');if(!b)return;state.filter=b.dataset.filter;document.querySelectorAll('.pill').forEach(x=>x.classList.toggle('active',x===b));renderSlots()});
+$('#captionInput').addEventListener('input',e=>{state.caption=e.target.value;$('#stripTitle').textContent=state.caption||' '});
+document.querySelectorAll('[data-caption]').forEach(b=>b.addEventListener('click',()=>{$('#captionInput').value=b.dataset.caption;state.caption=b.dataset.caption;$('#stripTitle').textContent=state.caption}));
+$('#shuffleBtn').onclick=()=>{const candidates=FRAMES.filter(f=>f.id!==state.frameId);setFrame(candidates[Math.floor(Math.random()*candidates.length)].id)};
+$('#resetBtn').onclick=reset;
+$('#downloadBtn').onclick=async()=>{const btn=$('#downloadBtn');btn.disabled=true;btn.textContent='正在生成…';try{const blob=await exportStrip(state);const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`time-sticker-${Date.now()}.png`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);notify('高清 PNG 已生成')}catch(err){console.error(err);notify('生成失败，请换一张照片重试')}finally{btn.disabled=false;btn.textContent='保存高清 PNG'}};
+$('#dateStamp').textContent=new Date().toLocaleDateString('zh-CN').replaceAll('/','.');renderFrameCards($('#frameGrid'),state.frameId,setFrame);renderSlots();
